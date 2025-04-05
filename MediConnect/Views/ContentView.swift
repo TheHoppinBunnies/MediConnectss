@@ -57,6 +57,12 @@ struct MainTabView: View {
                     Label("Profile", systemImage: "person.fill")
                 }
                 .tag(AppState.Tab.profile)
+
+            MedicalPictureManagerView()
+                .tabItem {
+                    Label("Images", systemImage: "photo.on.rectangle.angled")
+                }
+                .tag(AppState.Tab.profile)
         }
     }
 }

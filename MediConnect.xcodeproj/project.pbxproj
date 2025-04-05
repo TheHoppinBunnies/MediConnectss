@@ -75,6 +75,7 @@
 		C2B497402D8F2C74004030BE /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B4973F2D8F2C74004030BE /* SpeechRecognizer.swift */; };
 		C2B497432D8F2D75004030BE /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B497422D8F2D75004030BE /* ChatBubble.swift */; };
 		C2B497452D8F2D93004030BE /* ContactDoctorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B497442D8F2D93004030BE /* ContactDoctorView.swift */; };
+		C2C663CB2DA1669F008C9574 /* MedicalImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2C663CA2DA1669F008C9574 /* MedicalImage.swift */; };
 		C2D7F02E2D821DD7003E27A8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2D7F02D2D821DD7003E27A8 /* Preview Assets.xcassets */; };
 		C2D7F0EA2D822026003E27A8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C2D7F0E92D822026003E27A8 /* GoogleService-Info.plist */; };
 		C2D7F1662D8225DA003E27A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2D7F1652D8225DA003E27A8 /* Assets.xcassets */; };
@@ -127,6 +128,7 @@
 		C2B4973F2D8F2C74004030BE /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		C2B497422D8F2D75004030BE /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
 		C2B497442D8F2D93004030BE /* ContactDoctorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDoctorView.swift; sourceTree = "<group>"; };
+		C2C663CA2DA1669F008C9574 /* MedicalImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalImage.swift; sourceTree = "<group>"; };
 		C2D7F0232D821DD3003E27A8 /* MediConnect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2D7F02D2D821DD7003E27A8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C2D7F0B62D821E4B003E27A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 				C24960BD2D8E22D500C2E59D /* SettingsView.swift */,
 				C203918E2D99D32500A25910 /* AzureAvatar.swift */,
 				C26E80062DA0C2CB0016D8C8 /* Exercices.swift */,
+				C2C663CA2DA1669F008C9574 /* MedicalImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -483,6 +486,7 @@
 				C24960A42D8E221200C2E59D /* AppState.swift in Sources */,
 				C236D9972D9252D100E126F4 /* SignUp.swift in Sources */,
 				C236D9902D9252D100E126F4 /* Page.swift in Sources */,
+				C2C663CB2DA1669F008C9574 /* MedicalImage.swift in Sources */,
 				C2B497322D8F1F4B004030BE /* VitalSign.swift in Sources */,
 				C236D9962D9252D100E126F4 /* Home.swift in Sources */,
 				C236D9922D9252D100E126F4 /* IntroView.swift in Sources */,
