@@ -26,8 +26,8 @@ class AppState: ObservableObject {
         // Simulate loading data
         self.appointments = sampleAppointments
         self.medications = sampleMedications
-        self.vitalSigns = sampleVitalSigns
-        self.chatHistory = sampleChatHistory
+//        self.vitalSigns = sampleVitalSigns
+//        self.chatHistory = sampleChatHistory
     }
 
     func searchNearbyHospitals(location: CLLocation) {

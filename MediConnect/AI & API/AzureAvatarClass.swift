@@ -3,7 +3,7 @@ import AVKit
 
 class AvatarSynthesisService: ObservableObject {
     // Configure with your Flask API URL
-    private let apiBaseURL = "http://192.168.2.14:5000/api"
+    private let apiBaseURL = "http://10.2.17.120:4000"
 
     @Published var isLoading = false
     @Published var statusMessage = "Ready"

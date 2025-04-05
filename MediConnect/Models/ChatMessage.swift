@@ -8,7 +8,7 @@
 import Foundation
 
 struct ChatMessage: Identifiable {
-    let id: UUID
+    let id: UUID = UUID()
     let sender: String
     let content: String
     let timestamp: Date

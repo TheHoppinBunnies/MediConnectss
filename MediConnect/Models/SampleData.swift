@@ -23,20 +23,20 @@ let sampleMedications: [Medication] = [
 ]
 
 // MARK: - Sample Vital Signs
-let sampleVitalSigns: [VitalSign] = [
-    VitalSign(id: UUID(), type: .heartRate, value: 72, unit: "bpm", timestamp: Date().addingTimeInterval(-3600)),
-    VitalSign(id: UUID(), type: .bloodPressure, value: 120/80, unit: "mmHg", timestamp: Date().addingTimeInterval(-7200)),
-    VitalSign(id: UUID(), type: .bloodOxygen, value: 98, unit: "%", timestamp: Date().addingTimeInterval(-3600)),
-    VitalSign(id: UUID(), type: .temperature, value: 98.6, unit: "°F", timestamp: Date().addingTimeInterval(-86400)),
-    VitalSign(id: UUID(), type: .respiratoryRate, value: 16, unit: "bpm", timestamp: Date().addingTimeInterval(-3600))
-]
+//let sampleVitalSigns: [VitalSign] = [
+//    VitalSign(id: UUID(), type: .heartRate, value: 72, unit: "bpm", timestamp: Date().addingTimeInterval(-3600)),
+//    VitalSign(id: UUID(), type: .bloodPressure, value: 120/80, unit: "mmHg", timestamp: Date().addingTimeInterval(-7200)),
+//    VitalSign(id: UUID(), type: .bloodOxygen, value: 98, unit: "%", timestamp: Date().addingTimeInterval(-3600)),
+//    VitalSign(id: UUID(), type: .temperature, value: 98.6, unit: "°F", timestamp: Date().addingTimeInterval(-86400)),
+//    VitalSign(id: UUID(), type: .respiratoryRate, value: 16, unit: "bpm", timestamp: Date().addingTimeInterval(-3600))
+//]
 
 // MARK: - Sample Chat History
-let sampleChatHistory: [ChatMessage] = [
-    ChatMessage(id: UUID(), sender: "AI", content: "Hello! How can I help you today?", timestamp: Date().addingTimeInterval(-3600)),
-    ChatMessage(id: UUID(), sender: "user", content: "I've been having a sore throat for the past 3 days.", timestamp: Date().addingTimeInterval(-3540)),
-    ChatMessage(id: UUID(), sender: "AI", content: "I'm sorry to hear that. Do you have any other symptoms like fever or cough?", timestamp: Date().addingTimeInterval(-3500))
-]
+//let sampleChatHistory: [ChatMessage] = [
+//    ChatMessage(sender: "AI", content: "Hello! How can I help you today?", timestamp: Date().addingTimeInterval(-3600)),
+//    ChatMessage(id: UUID(), sender: "user", content: "I've been having a sore throat for the past 3 days.", timestamp: Date().addingTimeInterval(-3540)),
+//    ChatMessage(id: UUID(), sender: "AI", content: "I'm sorry to hear that. Do you have any other symptoms like fever or cough?", timestamp: Date().addingTimeInterval(-3500))
+//]
 
 
 // MARK: - Sample Hospitals

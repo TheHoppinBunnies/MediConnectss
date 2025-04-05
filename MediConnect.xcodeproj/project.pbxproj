@@ -37,6 +37,7 @@
 		C24960BE2D8E22D500C2E59D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C24960BD2D8E22D500C2E59D /* SettingsView.swift */; };
 		C25853262D99768D00B66261 /* HeyGen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25853252D99768D00B66261 /* HeyGen.swift */; };
 		C25853282D9976A900B66261 /* HeyGenModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25853272D9976A900B66261 /* HeyGenModels.swift */; };
+		C26E80072DA0C2CB0016D8C8 /* Exercices.swift in Sources */ = {isa = PBXBuildFile; fileRef = C26E80062DA0C2CB0016D8C8 /* Exercices.swift */; };
 		C2B4972C2D8F1DF6004030BE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B4972B2D8F1DF6004030BE /* User.swift */; };
 		C2B4972E2D8F1E0D004030BE /* Appointment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B4972D2D8F1E0D004030BE /* Appointment.swift */; };
 		C2B497302D8F1E99004030BE /* Medication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B4972F2D8F1E99004030BE /* Medication.swift */; };
@@ -112,6 +113,8 @@
 		C24960BD2D8E22D500C2E59D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C25853252D99768D00B66261 /* HeyGen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeyGen.swift; sourceTree = "<group>"; };
 		C25853272D9976A900B66261 /* HeyGenModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeyGenModels.swift; sourceTree = "<group>"; };
+		C26E80062DA0C2CB0016D8C8 /* Exercices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercices.swift; sourceTree = "<group>"; };
+		C26E80082DA0C9460016D8C8 /* MediConnect.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MediConnect.entitlements; sourceTree = "<group>"; };
 		C2B4972B2D8F1DF6004030BE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C2B4972D2D8F1E0D004030BE /* Appointment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appointment.swift; sourceTree = "<group>"; };
 		C2B4972F2D8F1E99004030BE /* Medication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Medication.swift; sourceTree = "<group>"; };
@@ -272,6 +275,7 @@
 				C24960BB2D8E22C700C2E59D /* ProfileView.swift */,
 				C24960BD2D8E22D500C2E59D /* SettingsView.swift */,
 				C203918E2D99D32500A25910 /* AzureAvatar.swift */,
+				C26E80062DA0C2CB0016D8C8 /* Exercices.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -318,6 +322,7 @@
 		C2D7F0252D821DD3003E27A8 /* MediConnect */ = {
 			isa = PBXGroup;
 			children = (
+				C26E80082DA0C9460016D8C8 /* MediConnect.entitlements */,
 				C2B497292D8F1D3E004030BE /* App */,
 				C2B497382D8F2738004030BE /* AI & API */,
 				C2B4972A2D8F1DCE004030BE /* Models */,
@@ -461,6 +466,7 @@
 				C2B497432D8F2D75004030BE /* ChatBubble.swift in Sources */,
 				C24960B62D8E229100C2E59D /* MedicationsView.swift in Sources */,
 				C2B4973A2D8F2748004030BE /* TTS.swift in Sources */,
+				C26E80072DA0C2CB0016D8C8 /* Exercices.swift in Sources */,
 				C24960AA2D8E223E00C2E59D /* ContentView.swift in Sources */,
 				C24960B82D8E229F00C2E59D /* VitalSignsView.swift in Sources */,
 				C2B497452D8F2D93004030BE /* ContactDoctorView.swift in Sources */,
@@ -620,6 +626,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = MediConnect/MediConnect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = MediConnect/App/Assets.xcassets;
@@ -643,7 +650,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.LetsCodeBunnies.MediConnect;
+				PRODUCT_BUNDLE_IDENTIFIER = com.LetsCodeBunniess.MediConnect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -658,6 +665,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = MediConnect/MediConnect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = MediConnect/App/Assets.xcassets;
@@ -681,7 +689,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.LetsCodeBunnies.MediConnect;
+				PRODUCT_BUNDLE_IDENTIFIER = com.LetsCodeBunniess.MediConnect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

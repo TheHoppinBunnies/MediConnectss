@@ -1,10 +1,3 @@
-//
-//  ProfileView.swift
-//  MediConnect
-//
-//  Created by Othmane EL MARIKY on 2025-03-21.
-//
-
 import SwiftUI
 
 struct ProfileView: View {
@@ -190,6 +183,8 @@ struct EditProfileView: View {
     }
 }
 
+import HealthKit
+
 struct MedicalProfileView: View {
     @EnvironmentObject var appState: AppState
     @State private var isEditing = false
@@ -199,13 +194,25 @@ struct MedicalProfileView: View {
     @State private var weight = "160 lbs"
     @State private var allergies = ["Peanuts", "Penicillin"]
     @State private var conditions = ["Asthma"]
+    @State private var usesMedicalID = false
+    @State private var healthStore: HKHealthStore?
+    @State private var medicalIDFetched = false
 
     let bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"]
 
     var body: some View {
         Form {
+            Section(header: Text("Data Source")) {
+                Toggle("Use Medical ID Data", isOn: $usesMedicalID)
+                    .onChange(of: usesMedicalID) { newValue in
+                        if newValue {
+                            requestMedicalIDAccess()
+                        }
+                    }
+            }
+
             Section(header: Text("Basic Information")) {
-                if isEditing {
+                if isEditing && !usesMedicalID {
                     DatePicker("Date of Birth", selection: $dateOfBirth, displayedComponents: .date)
 
                     Picker("Blood Type", selection: $bloodType) {
@@ -248,7 +255,7 @@ struct MedicalProfileView: View {
             }
 
             Section(header: Text("Allergies")) {
-                if isEditing {
+                if isEditing && !usesMedicalID {
                     ForEach(allergies.indices, id: \.self) { index in
                         TextField("Allergy", text: $allergies[index])
                     }
@@ -269,7 +276,7 @@ struct MedicalProfileView: View {
             }
 
             Section(header: Text("Medical Conditions")) {
-                if isEditing {
+                if isEditing && !usesMedicalID {
                     ForEach(conditions.indices, id: \.self) { index in
                         TextField("Condition", text: $conditions[index])
                     }
@@ -288,14 +295,37 @@ struct MedicalProfileView: View {
                     }
                 }
             }
+
+            if usesMedicalID && !medicalIDFetched {
+                Section {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
+                    }
+                    Text("Fetching Medical ID data...")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+            }
         }
         .navigationTitle("Medical Profile")
         .navigationBarItems(trailing:
             Button(isEditing ? "Done" : "Edit") {
-                isEditing.toggle()
+                if usesMedicalID {
+                    // Show alert that editing is disabled when using Medical ID
+                    // This is a placeholder for where you'd show an alert
+                    print("Cannot edit when using Medical ID")
+                } else {
+                    isEditing.toggle()
+                }
             }
+            .disabled(usesMedicalID)
         )
         .onAppear {
+            setupHealthKit()
+
             // Load user data
             if let user = appState.user {
                 dateOfBirth = user.dateOfBirth
@@ -303,6 +333,138 @@ struct MedicalProfileView: View {
                 allergies = user.allergies
                 conditions = user.conditions
             }
+        }
+    }
+
+    private func setupHealthKit() {
+        if HKHealthStore.isHealthDataAvailable() {
+            healthStore = HKHealthStore()
+        }
+    }
+
+    private func requestMedicalIDAccess() {
+        guard let healthStore = healthStore else {
+            return
+        }
+
+        // Define the health data types your app will read
+        let readTypes: Set<HKObjectType> = [
+            HKObjectType.characteristicType(forIdentifier: .dateOfBirth)!,
+            HKObjectType.characteristicType(forIdentifier: .bloodType)!,
+            HKObjectType.quantityType(forIdentifier: .height)!,
+            HKObjectType.quantityType(forIdentifier: .bodyMass)!
+            // Note: Medical conditions and allergies aren't directly available through HealthKit
+            // They are part of the Medical ID but not exposed through the API
+        ]
+
+        healthStore.requestAuthorization(toShare: nil, read: readTypes) { success, error in
+            if success {
+                DispatchQueue.main.async {
+                    self.fetchMedicalIDData()
+                }
+            } else if let error = error {
+                print("Authorization failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func fetchMedicalIDData() {
+        guard let healthStore = healthStore else {
+            return
+        }
+
+        // Fetch date of birth
+        do {
+            let dateOfBirthComponents = try healthStore.dateOfBirthComponents()
+            if let dob = Calendar.current.date(from: dateOfBirthComponents) {
+                DispatchQueue.main.async {
+                    self.dateOfBirth = dob
+                }
+            }
+        } catch {
+            print("Failed to fetch date of birth: \(error.localizedDescription)")
+        }
+
+        // Fetch blood type
+        do {
+            let bloodTypeValue = try healthStore.bloodType().bloodType
+
+            let bloodTypeString: String
+            switch bloodTypeValue {
+            case .aPositive:
+                bloodTypeString = "A+"
+            case .aNegative:
+                bloodTypeString = "A-"
+            case .bPositive:
+                bloodTypeString = "B+"
+            case .bNegative:
+                bloodTypeString = "B-"
+            case .abPositive:
+                bloodTypeString = "AB+"
+            case .abNegative:
+                bloodTypeString = "AB-"
+            case .oPositive:
+                bloodTypeString = "O+"
+            case .oNegative:
+                bloodTypeString = "O-"
+            case .notSet:
+                bloodTypeString = "Unknown"
+            @unknown default:
+                bloodTypeString = "Unknown"
+            }
+
+            DispatchQueue.main.async {
+                self.bloodType = bloodTypeString
+            }
+        } catch {
+            print("Failed to fetch blood type: \(error.localizedDescription)")
+        }
+
+        // Fetch height
+        let heightType = HKQuantityType.quantityType(forIdentifier: .height)!
+        let heightQuery = HKSampleQuery(sampleType: heightType, predicate: nil, limit: 1, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]) { _, samples, error in
+            if let heightSample = samples?.first as? HKQuantitySample {
+                let heightInMeters = heightSample.quantity.doubleValue(for: HKUnit.meter())
+
+                // Convert to feet and inches for display
+                let heightInFeet = heightInMeters * 3.28084
+                let feet = Int(heightInFeet)
+                let inches = Int((heightInFeet - Double(feet)) * 12)
+
+                DispatchQueue.main.async {
+                    self.height = "\(feet)'\(inches)\""
+                }
+            } else if let error = error {
+                print("Failed to fetch height: \(error.localizedDescription)")
+            }
+        }
+
+        healthStore.execute(heightQuery)
+
+        // Fetch weight
+        let weightType = HKQuantityType.quantityType(forIdentifier: .bodyMass)!
+        let weightQuery = HKSampleQuery(sampleType: weightType, predicate: nil, limit: 1, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]) { _, samples, error in
+            if let weightSample = samples?.first as? HKQuantitySample {
+                let weightInKg = weightSample.quantity.doubleValue(for: HKUnit.gramUnit(with: .kilo))
+
+                // Convert to pounds for display
+                let weightInLbs = Int(weightInKg * 2.20462)
+
+                DispatchQueue.main.async {
+                    self.weight = "\(weightInLbs) lbs"
+                }
+            } else if let error = error {
+                print("Failed to fetch weight: \(error.localizedDescription)")
+            }
+        }
+
+        healthStore.execute(weightQuery)
+
+        // Note: For medical conditions and allergies, you can't access them directly through HealthKit API
+        // Users would need to enter these manually or you could consider using other methods
+
+        DispatchQueue.main.async {
+            self.medicalIDFetched = true
         }
     }
 

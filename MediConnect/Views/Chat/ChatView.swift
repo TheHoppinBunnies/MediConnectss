@@ -138,7 +138,7 @@ struct ChatView: View {
         guard !newMessage.isEmpty else { return }
 
         let userMessage = ChatMessage(
-            id: UUID(),
+//            id: UUID(),
             sender: "user",
             content: newMessage,
             timestamp: Date()
@@ -149,7 +149,7 @@ struct ChatView: View {
         let db = Firestore.firestore()
         let cardRef = db.collection("messages").document()
         let cardData: [String: Any] = [
-            "id": UUID(),
+//            "id": UUID(),
             "sender": "user",
             "content": newMessage,
             "timestamp": Date(),
@@ -184,7 +184,7 @@ struct ChatView: View {
             let db = Firestore.firestore()
             let cardRef = db.collection("expenses").document()
             let cardData: [String: Any] = [
-                "id": UUID(),
+//                "id": UUID(),
                 "sender": "AI",
                 "content": self.aiResponse,
                 "timestamp": Date(),
@@ -199,7 +199,7 @@ struct ChatView: View {
             }
 
             return ChatMessage(
-                id: UUID(),
+//                id: UUID(),
                 sender: "AI",
                 content: result.text!,
                 timestamp: Date()

@@ -1,35 +1,44 @@
-//
-//  VitalSignsView.swift
-//  MediConnect
-//
-//  Created by Othmane EL MARIKY on 2025-03-21.
-//
-
 import SwiftUI
+import HealthKit
 
 struct VitalSignsView: View {
-    @EnvironmentObject var appState: AppState
+    @StateObject private var healthStore = HealthStore()
+    @State private var vitalSigns: [VitalSign] = []
+    @State private var isLoading = true
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Vital signs cards
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-                    ForEach(vitalSignsByType.keys.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { type in
-                        if let latestVital = vitalSignsByType[type]?.first {
-                            VitalSignDetailCard(vitalSign: latestVital, history: vitalSignsByType[type] ?? [])
+                if isLoading {
+                    ProgressView("Loading health data...")
+                        .padding()
+                } else if vitalSigns.isEmpty {
+                    Text("No health data available")
+                        .foregroundColor(.secondary)
+                        .padding()
+                } else {
+                    // Vital signs cards
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                        ForEach(vitalSignsByType.keys.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { type in
+                            if let latestVital = vitalSignsByType[type]?.first {
+                                VitalSignDetailCard(vitalSign: latestVital, history: vitalSignsByType[type] ?? [])
+                            }
                         }
                     }
+                    .padding()
                 }
-                .padding()
 
                 // Connect to wearable devices button
                 Button(action: {
-                    // Action to connect to wearable devices
+                    healthStore.requestAuthorization { success in
+                        if success {
+                            loadHealthData()
+                        }
+                    }
                 }) {
                     HStack {
                         Image(systemName: "applewatch")
-                        Text("Connect to Apple Watch")
+                        Text("Connect to Health Data")
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -56,15 +65,201 @@ struct VitalSignsView: View {
                 }
             }
             .navigationTitle("Vital Signs")
+            .onAppear {
+                healthStore.requestAuthorization { success in
+                    if success {
+                        loadHealthData()
+                    } else {
+                        isLoading = false
+                    }
+                }
+            }
+        }
+    }
+
+    private func loadHealthData() {
+        isLoading = true
+        healthStore.fetchAllVitalSigns { fetchedVitals in
+            self.vitalSigns = fetchedVitals
+            self.isLoading = false
         }
     }
 
     // Group vital signs by type and sort by date (newest first)
     private var vitalSignsByType: [VitalSign.VitalType: [VitalSign]] {
-        Dictionary(grouping: appState.vitalSigns, by: { $0.type })
+        Dictionary(grouping: vitalSigns, by: { $0.type })
             .mapValues { values in
                 values.sorted(by: { $0.timestamp > $1.timestamp })
             }
+    }
+}
+
+// Model for Vital Signs
+
+
+class HealthStore: ObservableObject {
+    private var healthStore: HKHealthStore?
+
+    init() {
+        if HKHealthStore.isHealthDataAvailable() {
+            healthStore = HKHealthStore()
+        }
+    }
+
+    func requestAuthorization(completion: @escaping (Bool) -> Void) {
+        guard let healthStore = self.healthStore else {
+            completion(false)
+            return
+        }
+
+        let typesToRead: [HKQuantityType] = [
+            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
+            HKQuantityType.quantityType(forIdentifier: .bloodPressureSystolic)!,
+            HKQuantityType.quantityType(forIdentifier: .bloodPressureDiastolic)!,
+            HKQuantityType.quantityType(forIdentifier: .oxygenSaturation)!,
+            HKQuantityType.quantityType(forIdentifier: .bodyTemperature)!,
+            HKQuantityType.quantityType(forIdentifier: .respiratoryRate)!
+        ]
+
+        healthStore.requestAuthorization(toShare: [], read: Set(typesToRead)) { success, error in
+            DispatchQueue.main.async {
+                completion(success)
+            }
+        }
+    }
+
+    func fetchAllVitalSigns(completion: @escaping ([VitalSign]) -> Void) {
+        var vitalSigns: [VitalSign] = []
+        let dispatchGroup = DispatchGroup()
+
+        // Heart Rate
+        dispatchGroup.enter()
+        fetchVitalSign(for: .heartRate) { vitals in
+            vitalSigns.append(contentsOf: vitals)
+            dispatchGroup.leave()
+        }
+
+        // Blood Pressure (Systolic)
+        dispatchGroup.enter()
+        fetchVitalSign(for: .bloodPressure, valueType: .systolic) { vitals in
+            vitalSigns.append(contentsOf: vitals)
+            dispatchGroup.leave()
+        }
+
+        // Blood Oxygen
+        dispatchGroup.enter()
+        fetchVitalSign(for: .bloodOxygen) { vitals in
+            vitalSigns.append(contentsOf: vitals)
+            dispatchGroup.leave()
+        }
+
+        // Body Temperature
+        dispatchGroup.enter()
+        fetchVitalSign(for: .temperature) { vitals in
+            vitalSigns.append(contentsOf: vitals)
+            dispatchGroup.leave()
+        }
+
+        // Respiratory Rate
+        dispatchGroup.enter()
+        fetchVitalSign(for: .respiratoryRate) { vitals in
+            vitalSigns.append(contentsOf: vitals)
+            dispatchGroup.leave()
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            completion(vitalSigns)
+        }
+    }
+
+    enum BPValueType {
+        case systolic
+        case diastolic
+    }
+
+    func fetchVitalSign(for vitalType: VitalSign.VitalType, valueType: BPValueType? = nil, completion: @escaping ([VitalSign]) -> Void) {
+        guard let healthStore = self.healthStore else {
+            completion([])
+            return
+        }
+
+        var quantityType: HKQuantityType
+        var unit: HKUnit
+
+        switch vitalType {
+        case .heartRate:
+            quantityType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+            unit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        case .bloodPressure:
+            if valueType == .diastolic {
+                quantityType = HKQuantityType.quantityType(forIdentifier: .bloodPressureDiastolic)!
+            } else {
+                quantityType = HKQuantityType.quantityType(forIdentifier: .bloodPressureSystolic)!
+            }
+            unit = HKUnit.millimeterOfMercury()
+        case .bloodOxygen:
+            quantityType = HKQuantityType.quantityType(forIdentifier: .oxygenSaturation)!
+            unit = HKUnit.percent()
+        case .temperature:
+            quantityType = HKQuantityType.quantityType(forIdentifier: .bodyTemperature)!
+            unit = HKUnit.degreeCelsius()
+        case .respiratoryRate:
+            quantityType = HKQuantityType.quantityType(forIdentifier: .respiratoryRate)!
+            unit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        }
+
+        let startDate = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date(), options: .strictStartDate)
+
+        let query = HKSampleQuery(
+            sampleType: quantityType,
+            predicate: predicate,
+            limit: 50,  // Adjust based on your needs
+            sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]
+        ) { _, samples, error in
+            var vitalSigns: [VitalSign] = []
+
+            guard let samples = samples as? [HKQuantitySample], error == nil else {
+                DispatchQueue.main.async {
+                    completion([])
+                }
+                return
+            }
+
+            for sample in samples {
+                let value = sample.quantity.doubleValue(for: unit)
+                let unitString = self.getUnitString(for: vitalType)
+
+                let vitalSign = VitalSign(
+                    type: vitalType,
+                    value: value,
+                    unit: unitString,
+                    timestamp: sample.endDate
+                )
+                vitalSigns.append(vitalSign)
+            }
+
+            DispatchQueue.main.async {
+                completion(vitalSigns)
+            }
+        }
+
+        healthStore.execute(query)
+    }
+
+    private func getUnitString(for vitalType: VitalSign.VitalType) -> String {
+        switch vitalType {
+        case .heartRate:
+            return "BPM"
+        case .bloodPressure:
+            return "mmHg"
+        case .bloodOxygen:
+            return "%"
+        case .temperature:
+            return "Â°C"
+        case .respiratoryRate:
+            return "BrPM"
+        }
     }
 }
 
@@ -85,7 +280,7 @@ struct VitalSignDetailCard: View {
                 Text(vitalSign.type.rawValue)
                     .font(.headline)
 
-                Text("\(Int(vitalSign.value)) \(vitalSign.unit)")
+                Text("\(formatValue(vitalSign.value)) \(vitalSign.unit)")
                     .font(.title2)
                     .foregroundColor(vitalSignColor(for: vitalSign))
 
@@ -101,6 +296,17 @@ struct VitalSignDetailCard: View {
         .buttonStyle(PlainButtonStyle())
         .sheet(isPresented: $showingHistory) {
             VitalSignHistoryView(vitalType: vitalSign.type, history: history)
+        }
+    }
+
+    private func formatValue(_ value: Double) -> String {
+        switch vitalSign.type {
+        case .bloodOxygen:
+            return String(format: "%.1f", value * 100) // Convert from decimal to percentage
+        case .temperature:
+            return String(format: "%.1f", value)
+        default:
+            return "\(Int(value))"
         }
     }
 
@@ -130,15 +336,16 @@ struct VitalSignDetailCard: View {
                 return .red
             }
         case .bloodOxygen:
-            if vitalSign.value < 95 {
+            let percentage = vitalSign.value * 100 // Convert from decimal to percentage
+            if percentage < 95 {
                 return .orange
-            } else if vitalSign.value < 90 {
+            } else if percentage < 90 {
                 return .red
             }
         case .temperature:
-            if vitalSign.value > 99.5 {
+            if vitalSign.value > 37.5 { // 99.5Â°F in Celsius
                 return .orange
-            } else if vitalSign.value > 100.4 {
+            } else if vitalSign.value > 38 { // 100.4Â°F in Celsius
                 return .red
             }
         case .respiratoryRate:
@@ -177,7 +384,7 @@ struct VitalSignHistoryView: View {
                 ForEach(history) { vital in
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("\(Int(vital.value)) \(vital.unit)")
+                            Text("\(formatValue(vital.value)) \(vital.unit)")
                                 .font(.headline)
                             Text(dateFormatter.string(from: vital.timestamp))
                                 .font(.caption)
@@ -199,6 +406,17 @@ struct VitalSignHistoryView: View {
             .navigationBarItems(trailing: Button("Done") {
                 presentationMode.wrappedValue.dismiss()
             })
+        }
+    }
+
+    private func formatValue(_ value: Double) -> String {
+        switch vitalType {
+        case .bloodOxygen:
+            return String(format: "%.1f", value * 100) // Convert from decimal to percentage
+        case .temperature:
+            return String(format: "%.1f", value)
+        default:
+            return "\(Int(value))"
         }
     }
 

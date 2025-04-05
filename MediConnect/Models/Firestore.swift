@@ -30,7 +30,7 @@ class AIMessagesViewModel: ObservableObject {
                     let content = data["content"] as? String ?? ""
                     let timestamp = data["timestamp"] as? Date ?? Date()
 
-                    return ChatMessage(id: UUID(uuidString: uid) ?? UUID(), sender: sender, content: content, timestamp: timestamp)
+                    return ChatMessage(sender: sender, content: content, timestamp: timestamp)
                 }
             }
     }

@@ -10,16 +10,18 @@ import FirebaseCore
 
 @main
 struct TelemedicineApp: App {
-//    @StateObject private var appState = AppState()
-//
-//    init() {
-//        FirebaseApp.configure()
-//    }
+    @StateObject private var appState = AppState()
+
+    init() {
+        FirebaseApp.configure()
+    }
 
     var body: some Scene {
         WindowGroup {
-            AvatarSynthesisView()
-//                .environmentObject(appState)
+//            AvatarSynthesisView()
+//            PomodoroTimerView()
+            ContentView()
+                .environmentObject(appState)
         }
     }
 }
