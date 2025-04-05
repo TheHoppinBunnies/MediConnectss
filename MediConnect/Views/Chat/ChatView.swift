@@ -48,22 +48,22 @@ struct ChatView: View {
     var body: some View {
         NavigationView {
             VStack {
-                HStack {
-                    Text("Chat with")
-                        .font(.largeTitle)
-                        .bold()
-                        .hSpacing(.leading)
-
-                    Picker("\(chatType)", selection: $chatType) {
-                        ForEach(chatTypes, id: \.self) { type in
-                            Text(type)
-                        }
-                    }
-                    .font(.largeTitle)
-                    .bold()
-                    .hSpacing(.leading).padding(.leading, -40)
-
-                }
+//                HStack {
+//                    Text("Chat with")
+//                        .font(.largeTitle)
+//                        .bold()
+//                        .hSpacing(.leading)
+//
+//                    Picker("\(chatType)", selection: $chatType) {
+//                        ForEach(chatTypes, id: \.self) { type in
+//                            Text(type)
+//                        }
+//                    }
+//                    .font(.largeTitle)
+//                    .bold()
+//                    .hSpacing(.leading).padding(.leading, -40)
+//
+//                }
 
                 // Chat messages
                 ScrollViewReader { scrollView in
@@ -118,7 +118,7 @@ struct ChatView: View {
                 }
                 .padding()
             }
-            //            .navigationTitle("Chat with AI")
+            .navigationTitle("Chat with AI")
             .navigationBarItems(trailing:
                                     Button(action: {
                 showContactDoctorSheet = true
@@ -149,11 +149,10 @@ struct ChatView: View {
         let db = Firestore.firestore()
         let cardRef = db.collection("messages").document()
         let cardData: [String: Any] = [
-//            "id": UUID(),
             "sender": "user",
             "content": newMessage,
             "timestamp": Date(),
-            "uid": String(Auth.auth().currentUser!.uid)
+            "uid": ""
         ]
 
         cardRef.setData(cardData) { (error) in
@@ -184,11 +183,10 @@ struct ChatView: View {
             let db = Firestore.firestore()
             let cardRef = db.collection("expenses").document()
             let cardData: [String: Any] = [
-//                "id": UUID(),
                 "sender": "AI",
                 "content": self.aiResponse,
                 "timestamp": Date(),
-                "uid": String(Auth.auth().currentUser!.uid)
+                "uid": String(Auth.auth().currentUser?.uid ?? "")
             ]
 
             do {

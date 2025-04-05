@@ -147,11 +147,11 @@ import AVFoundation
 struct CameraView: UIViewControllerRepresentable {
     class Coordinator: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         var parent: CameraView
-
+        
         init(parent: CameraView) {
             self.parent = parent
         }
-
+        
         // This function processes the video frames if needed
         func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
             // You can process video frames here if needed.
@@ -159,7 +159,7 @@ struct CameraView: UIViewControllerRepresentable {
     }
 
     var isFrontCamera: Bool // Always use the front camera
-
+    
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
     }
@@ -180,39 +180,39 @@ class CameraViewController: UIViewController {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: CameraView.Coordinator?
-
+    
     private var currentDevice: AVCaptureDevice?
     private var isFrontCamera: Bool
-
+    
     init(isFrontCamera: Bool) {
         self.isFrontCamera = isFrontCamera
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         setupCamera()
     }
 
     // Set up the camera with the front camera only
     private func setupCamera() {
         captureSession = AVCaptureSession()
-
+        
         // Get the front camera (selfie mode)
         let devices = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .unspecified).devices
         guard !devices.isEmpty else {
             print("No camera found")
             return
         }
-
+        
         // Select the front-facing camera
         let device = devices.first(where: { $0.position == .front })
-
+        
         guard let cameraDevice = device else {
             print("No front camera available")
             return
@@ -263,7 +263,7 @@ class CameraViewController: UIViewController {
         let frameSize = CGSize(width: 100, height: 150)
         let xOffset = (view.bounds.width - frameSize.width) / 2
         let yOffset = (view.bounds.height - frameSize.height) / 2
-
+        
         // Set the frame for the preview layer (center it in the smaller frame)
         previewLayer.frame = CGRect(x: xOffset, y: yOffset, width: frameSize.width, height: frameSize.height)
     }
@@ -285,8 +285,8 @@ class CameraViewController: UIViewController {
 
 struct Dumb: View {
     var body: some View {
-        CameraView(isFrontCamera: true) // Start with front camera (selfie mode)
-            .frame(width: 100, height: 150) // Set the desired frame size
+        CameraView(isFrontCamera: true)
+            .frame(width: 100, height: 150)
             .cornerRadius(30)
             .shadow(radius: 10)
 //            .overlay(

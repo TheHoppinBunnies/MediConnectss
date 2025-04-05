@@ -33,23 +33,27 @@ struct HomeView: View {
                     }
 
                     // Quick Actions
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-                        NavigationLink(destination: VideoCallView(isAI: true)) {
-                            QuickActionButton(icon: "video.fill", title: "AI Consultation", color: .blue)
+                    VStack {
+                        HStack {
+                            NavigationLink(destination: VideoCallView(isAI: true)) {
+                                QuickActionButton(icon: "video.fill", title: "AI Consultation", color: .blue)
+                            }
+                            
+                            NavigationLink(destination: NearbyHospitalsView()) {
+                                QuickActionButton(icon: "building.2.fill", title: "Nearby Hospitals", color: .green)
+                            }
                         }
-
-                        NavigationLink(destination: NearbyHospitalsView()) {
-                            QuickActionButton(icon: "building.2.fill", title: "Nearby Hospitals", color: .green)
-                        }
-
-                        NavigationLink(destination: VitalSignsView()) {
-                            QuickActionButton(icon: "waveform.path.ecg", title: "Vital Signs", color: .orange)
-                        }
-
-                        NavigationLink(destination: ChatView()) {
-                            QuickActionButton(icon: "message.fill", title: "Chat with AI", color: .purple)
+                        HStack {
+                            NavigationLink(destination: VitalSignsView()) {
+                                QuickActionButton(icon: "waveform.path.ecg", title: "Vital Signs", color: .orange)
+                            }
+                            
+                            NavigationLink(destination: ChatView()) {
+                                QuickActionButton(icon: "message.fill", title: "Chat with AI", color: .purple)
+                            }
                         }
                     }
+                
 
                     // Upcoming Appointments
                     VStack(alignment: .leading) {
@@ -150,6 +154,7 @@ struct QuickActionButton: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
+        .frame(height: 45)
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(10)

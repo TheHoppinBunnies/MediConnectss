@@ -18,8 +18,6 @@ struct TelemedicineApp: App {
 
     var body: some Scene {
         WindowGroup {
-//            AvatarSynthesisView()
-//            PomodoroTimerView()
             ContentView()
                 .environmentObject(appState)
         }
